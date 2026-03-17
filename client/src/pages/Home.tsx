@@ -24,6 +24,7 @@ const METRICS = [
 export default function Home() {
   const [, setLocation] = useLocation();
   const [ready, setReady] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 80);
@@ -45,7 +46,7 @@ export default function Home() {
       />
 
       {/* ── Nav ── */}
-      <nav className="relative z-20 flex items-center justify-between px-8 md:px-12 py-5 flex-shrink-0">
+      <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -61,37 +62,77 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Nav links */}
-        <div className="hidden md:flex items-center gap-8">
-          {["功能", "技术", "案例"].map((item) => (
+        {/* Nav links — desktop */}
+        <div className="hidden md:flex items-center gap-1">
+          {[
+            { label: "开始检测", path: "/chat" },
+            { label: "护肤日历", path: "/calendar" },
+            { label: "历史记录", path: "/history" },
+          ].map((item) => (
             <button
-              key={item}
-              className="text-[#9A8C82] hover:text-[#2D2420] transition-colors duration-200 text-sm"
+              key={item.label}
+              onClick={() => setLocation(item.path)}
+              className="px-3.5 py-2 text-[#9A8C82] hover:text-[#2D2420] hover:bg-[rgba(45,36,32,0.04)] rounded-lg transition-all duration-200 text-sm"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              {item}
+              {item.label}
             </button>
           ))}
         </div>
 
-        {/* CTA */}
-        <button
-          onClick={() => setLocation("/chat")}
-          className="btn-primary text-sm py-2 px-5"
-        >
-          免费检测
-        </button>
+        {/* CTA + mobile menu */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLocation("/chat")}
+            className="btn-primary text-sm py-2 px-5"
+          >
+            免费检测
+          </button>
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setMenuOpen(v => !v)}
+            className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#9A8C82] hover:text-[#2D2420] hover:bg-[rgba(45,36,32,0.06)] transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              {menuOpen
+                ? <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                : <><path d="M2 4H14M2 8H14M2 12H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></>
+              }
+            </svg>
+          </button>
+        </div>
       </nav>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="relative z-20 md:hidden flex-shrink-0 mx-4 mb-2 rounded-xl border border-[rgba(45,36,32,0.08)] bg-[rgba(253,250,247,0.95)] overflow-hidden" style={{ backdropFilter: "blur(12px)" }}>
+          {[
+            { label: "开始检测", path: "/chat", icon: "M7.5 1.5C4.186 1.5 1.5 4.186 1.5 7.5S4.186 13.5 7.5 13.5 13.5 10.814 13.5 7.5 10.814 1.5 7.5 1.5Z" },
+            { label: "护肤日历", path: "/calendar", icon: "M2 3H13V13H2V3ZM5 1V4M10 1V4M2 7H13" },
+            { label: "历史记录", path: "/history", icon: "M8 3V8L11 11M8 1C4.134 1 1 4.134 1 8s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7Z" },
+          ].map((item) => (
+            <button
+              key={item.label}
+              onClick={() => { setLocation(item.path); setMenuOpen(false); }}
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-[#5C4F47] hover:text-[#C17B5C] hover:bg-[rgba(193,123,92,0.04)] transition-all border-b border-[rgba(45,36,32,0.05)] last:border-0 text-sm"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d={item.icon} stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ── Main Content ── */}
       <div className="relative z-10 flex-1 flex items-stretch overflow-hidden">
         {/* Left panel */}
-        <div className="flex-1 flex flex-col justify-center px-8 md:px-12 lg:px-16 py-6 min-w-0">
+        <div className="flex-1 flex flex-col justify-center px-6 md:px-12 lg:px-16 py-6 min-w-0">
 
           {/* Badge */}
-          <div
-            className={`mb-6 anim-fade-up ${ready ? "" : "opacity-0"}`}
-          >
+          <div className={`mb-6 anim-fade-up ${ready ? "" : "opacity-0"}`}>
             <span className="pill-clay">✦ AI 皮肤智能分析</span>
           </div>
 
@@ -126,7 +167,7 @@ export default function Home() {
           {/* Divider */}
           <div className={`my-7 warm-divider w-20 anim-fade-in d-300 ${ready ? "" : "opacity-0"}`} />
 
-          {/* Buttons */}
+          {/* Primary buttons */}
           <div className={`flex flex-wrap gap-3 anim-fade-up d-300 ${ready ? "" : "opacity-0"}`}>
             <button onClick={() => setLocation("/chat")} className="btn-primary">
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
@@ -140,8 +181,35 @@ export default function Home() {
             </button>
           </div>
 
+          {/* Secondary nav links */}
+          <div className={`mt-5 flex items-center gap-4 anim-fade-up d-350 ${ready ? "" : "opacity-0"}`}>
+            <button
+              onClick={() => setLocation("/calendar")}
+              className="flex items-center gap-1.5 text-[#9A8C82] hover:text-[#C17B5C] transition-colors text-sm group"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:stroke-[#C17B5C] transition-colors">
+                <rect x="1" y="2" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
+                <path d="M4 1V3M10 1V3M1 6H13" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+              </svg>
+              护肤日历
+            </button>
+            <span className="text-[#DDD7CE]">·</span>
+            <button
+              onClick={() => setLocation("/history")}
+              className="flex items-center gap-1.5 text-[#9A8C82] hover:text-[#C17B5C] transition-colors text-sm group"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:stroke-[#C17B5C] transition-colors">
+                <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.1" />
+                <path d="M7 4V7L9.5 9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+              </svg>
+              历史记录
+            </button>
+          </div>
+
           {/* Stats */}
-          <div className={`mt-10 flex items-center gap-8 anim-fade-up d-400 ${ready ? "" : "opacity-0"}`}>
+          <div className={`mt-8 flex items-center gap-8 anim-fade-up d-400 ${ready ? "" : "opacity-0"}`}>
             {[
               { n: "98%", sub: "准确率" },
               { n: "30s", sub: "出结果" },
@@ -202,7 +270,7 @@ export default function Home() {
 
       {/* ── Bottom bar ── */}
       <div
-        className={`relative z-20 flex-shrink-0 flex items-center justify-between px-8 md:px-12 py-3 border-t border-[rgba(45,36,32,0.06)] anim-fade-in d-500 ${ready ? "" : "opacity-0"}`}
+        className={`relative z-20 flex-shrink-0 flex items-center justify-between px-6 md:px-12 py-3 border-t border-[rgba(45,36,32,0.06)] anim-fade-in d-500 ${ready ? "" : "opacity-0"}`}
       >
         <p
           className="text-[#B5ADA7] text-xs"

@@ -1,7 +1,7 @@
 /**
  * 芯颜 AI — App Router
  * Theme: Light (warm ivory)
- * Routes: / | /chat | /result
+ * Routes: / | /chat | /result | /calendar | /history
  */
 
 import { Toaster } from "@/components/ui/sonner";
@@ -13,6 +13,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Result from "./pages/Result";
+import Calendar from "./pages/Calendar";
+import History from "./pages/History";
 
 function Router() {
   return (
@@ -20,6 +22,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/chat" component={Chat} />
       <Route path="/result" component={Result} />
+      <Route path="/calendar" component={Calendar} />
+      <Route path="/history" component={History} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
