@@ -1,55 +1,72 @@
 /**
- * LUMIÈRE AI — Landing Page
- * Design: Dark Luxe | Deep Espresso + Café Gold
- * Layout: Asymmetric full-screen hero, left text / right image
- * Typography: Cormorant Garamond (display) + DM Sans (body)
+ * 芯颜 AI — Landing Page
+ * Design: Warm Ivory Minimalism (Claude-inspired)
+ * Layout: Full-viewport locked, no scroll, split left/right
+ * Colors: Warm cream bg #F2EDE6, terracotta accent #C17B5C
+ * Typography: Noto Serif SC (display) + DM Sans (body)
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
-const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663445632732/YSJ4oSQb66XaWP4wqUTjGd/hero-face-WjEg5morYicKXqnHybAouY.webp";
+const HERO_IMAGE =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663445632732/YSJ4oSQb66XaWP4wqUTjGd/hero-face-v2-euoxTCUUMVSboNQDUe9oiM.webp";
+
+const METRICS = [
+  { label: "水分", val: 88 },
+  { label: "油脂", val: 72 },
+  { label: "色斑", val: 65 },
+  { label: "毛孔", val: 58 },
+  { label: "亮度", val: 78 },
+  { label: "弹性", val: 91 },
+];
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const [visible, setVisible] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 100);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setReady(true), 80);
+    return () => clearTimeout(t);
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0D0A07] overflow-hidden relative">
-      {/* Ambient glow */}
+    <div
+      className="page-locked flex flex-col"
+      style={{ background: "linear-gradient(135deg, #F5F0E8 0%, #EDE8DF 100%)" }}
+    >
+      {/* Subtle warm texture overlay */}
       <div
-        className="absolute top-0 right-0 w-[60vw] h-[60vh] pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at 80% 20%, rgba(201,169,110,0.06) 0%, transparent 70%)",
+          backgroundImage:
+            "radial-gradient(ellipse 80% 60% at 70% 50%, rgba(193,123,92,0.06) 0%, transparent 70%)",
         }}
       />
 
-      {/* Nav */}
-      <nav className="relative z-20 flex items-center justify-between px-8 md:px-16 py-8">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 relative">
-            <div className="absolute inset-0 border border-[#C9A96E] rotate-45 opacity-60" />
-            <div className="absolute inset-[3px] bg-[#C9A96E] rotate-45 opacity-30" />
-          </div>
+      {/* ── Nav ── */}
+      <nav className="relative z-20 flex items-center justify-between px-8 md:px-12 py-5 flex-shrink-0">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="10" stroke="#C17B5C" strokeWidth="1.2" />
+            <circle cx="11" cy="11" r="5" fill="rgba(193,123,92,0.15)" stroke="#C17B5C" strokeWidth="1" />
+            <circle cx="11" cy="11" r="2" fill="#C17B5C" />
+          </svg>
           <span
-            className="text-[#C9A96E] tracking-[0.3em] text-xs uppercase font-medium"
+            className="text-[#2D2420] font-medium tracking-wide text-sm"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            LUMIÈRE AI
+            芯颜 <span className="text-[#C17B5C]">AI</span>
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-10">
-          {["关于", "技术", "案例"].map((item) => (
+        {/* Nav links */}
+        <div className="hidden md:flex items-center gap-8">
+          {["功能", "技术", "案例"].map((item) => (
             <button
               key={item}
-              className="text-[#7A6F63] hover:text-[#C9A96E] transition-colors duration-300 text-xs tracking-[0.12em] uppercase"
+              className="text-[#9A8C82] hover:text-[#2D2420] transition-colors duration-200 text-sm"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               {item}
@@ -57,245 +74,268 @@ export default function Home() {
           ))}
         </div>
 
+        {/* CTA */}
         <button
           onClick={() => setLocation("/chat")}
-          className="btn-luxury text-xs"
+          className="btn-primary text-sm py-2 px-5"
         >
-          开始检测
+          免费检测
         </button>
       </nav>
 
-      {/* Hero Section */}
-      <div className="relative z-10 min-h-[calc(100vh-96px)] flex items-center">
-        <div className="w-full px-8 md:px-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 items-center">
+      {/* ── Main Content ── */}
+      <div className="relative z-10 flex-1 flex items-stretch overflow-hidden">
+        {/* Left panel */}
+        <div className="flex-1 flex flex-col justify-center px-8 md:px-12 lg:px-16 py-6 min-w-0">
 
-          {/* Left: Text Content */}
-          <div className="flex flex-col justify-center lg:pr-16">
-            {/* Label */}
-            <div
-              className={`flex items-center gap-3 mb-10 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-            >
-              <div className="h-px w-8 bg-[#C9A96E] opacity-60" />
-              <span
-                className="text-[#C9A96E] text-[10px] tracking-[0.35em] uppercase opacity-80"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                AI Skin Intelligence
-              </span>
-            </div>
-
-            {/* Main Title */}
-            <h1
-              className={`transition-all duration-700 delay-100 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "clamp(3rem, 6vw, 5.5rem)",
-                fontWeight: 300,
-                lineHeight: 1.05,
-                letterSpacing: "-0.01em",
-                color: "#F5F0E8",
-              }}
-            >
-              了解你的
-              <br />
-              <span className="text-gold-gradient italic">皮肤状态</span>
-            </h1>
-
-            {/* Subtitle */}
-            <p
-              className={`mt-8 text-[#7A6F63] leading-relaxed max-w-sm transition-all duration-700 delay-200 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "0.9375rem",
-                fontWeight: 300,
-                letterSpacing: "0.02em",
-              }}
-            >
-              上传一张照片，LUMIÈRE AI 将为你深度分析皮肤问题，
-              <br className="hidden md:block" />
-              提供个性化护肤方案与专业产品建议。
-            </p>
-
-            {/* Divider */}
-            <div
-              className={`my-10 w-16 h-px transition-all duration-700 delay-300 ${visible ? "opacity-100" : "opacity-0"}`}
-              style={{ background: "linear-gradient(90deg, rgba(201,169,110,0.5), transparent)" }}
-            />
-
-            {/* CTA Buttons */}
-            <div
-              className={`flex flex-col sm:flex-row gap-4 transition-all duration-700 delay-400 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-            >
-              <button
-                onClick={() => setLocation("/chat")}
-                className="btn-luxury-filled"
-              >
-                开始检测
-              </button>
-              <button
-                onClick={() => setLocation("/chat")}
-                className="btn-luxury"
-              >
-                咨询专家
-              </button>
-            </div>
-
-            {/* Stats row */}
-            <div
-              className={`mt-14 flex items-center gap-10 transition-all duration-700 delay-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-            >
-              {[
-                { value: "98%", label: "分析准确率" },
-                { value: "30s", label: "出结果时间" },
-                { value: "12+", label: "检测维度" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex flex-col gap-1">
-                  <span
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: "1.75rem",
-                      fontWeight: 400,
-                      color: "#C9A96E",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {stat.value}
-                  </span>
-                  <span
-                    className="text-[#7A6F63] text-[10px] tracking-[0.12em] uppercase"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+          {/* Badge */}
+          <div
+            className={`mb-6 anim-fade-up ${ready ? "" : "opacity-0"}`}
+          >
+            <span className="pill-clay">✦ AI 皮肤智能分析</span>
           </div>
 
-          {/* Right: Image + Score Badge */}
-          <div
-            className={`relative flex justify-center lg:justify-end transition-all duration-1000 delay-200 ${visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
+          {/* Headline */}
+          <h1
+            className={`anim-fade-up d-100 ${ready ? "" : "opacity-0"}`}
+            style={{
+              fontFamily: "'Noto Serif SC', serif",
+              fontSize: "clamp(2.4rem, 4.5vw, 4rem)",
+              fontWeight: 300,
+              lineHeight: 1.15,
+              color: "#2D2420",
+              letterSpacing: "-0.01em",
+            }}
           >
-            {/* Image container */}
-            <div className="relative w-full max-w-[420px] lg:max-w-[480px]">
-              {/* Subtle gold frame */}
-              <div
-                className="absolute -inset-px"
-                style={{
-                  background: "linear-gradient(135deg, rgba(201,169,110,0.2) 0%, transparent 50%, rgba(201,169,110,0.1) 100%)",
-                  borderRadius: "2px",
-                }}
-              />
+            了解你的
+            <br />
+            <span className="text-clay-gradient" style={{ fontWeight: 400 }}>
+              皮肤状态
+            </span>
+          </h1>
 
-              <img
-                src={HERO_IMAGE}
-                alt="AI皮肤分析示例"
-                className="relative w-full object-cover"
-                style={{
-                  aspectRatio: "3/4",
-                  borderRadius: "2px",
-                  filter: "contrast(1.02) brightness(0.98)",
-                }}
-              />
+          {/* Subtext */}
+          <p
+            className={`mt-5 text-[#7A6E68] leading-relaxed max-w-[340px] anim-fade-up d-200 ${ready ? "" : "opacity-0"}`}
+            style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.9375rem", fontWeight: 300 }}
+          >
+            上传一张照片，芯颜 AI 在 30 秒内为你分析
+            12 个皮肤维度，给出专属护肤方案。
+          </p>
 
-              {/* Score Badge — only overlay */}
-              <div
-                className={`absolute bottom-8 -left-6 md:-left-10 card-luxury p-5 min-w-[160px] transition-all duration-700 delay-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-                style={{
-                  backdropFilter: "blur(20px)",
-                  background: "rgba(13,10,7,0.85)",
-                  border: "1px solid rgba(201,169,110,0.25)",
-                  borderRadius: "2px",
-                  boxShadow: "0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,169,110,0.05)",
-                }}
-              >
-                <div className="flex items-end gap-1 mb-2">
-                  <span
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: "3rem",
-                      fontWeight: 400,
-                      color: "#C9A96E",
-                      lineHeight: 1,
-                    }}
-                  >
-                    82
-                  </span>
-                  <span
-                    className="text-[#7A6F63] mb-2 text-sm"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    / 100
-                  </span>
-                </div>
-                <div className="gold-divider mb-2" />
-                <p
-                  className="text-[#B8AFA0] text-[11px] tracking-[0.08em]"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+          {/* Divider */}
+          <div className={`my-7 warm-divider w-20 anim-fade-in d-300 ${ready ? "" : "opacity-0"}`} />
+
+          {/* Buttons */}
+          <div className={`flex flex-wrap gap-3 anim-fade-up d-300 ${ready ? "" : "opacity-0"}`}>
+            <button onClick={() => setLocation("/chat")} className="btn-primary">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M7.5 1.5C4.186 1.5 1.5 4.186 1.5 7.5S4.186 13.5 7.5 13.5 13.5 10.814 13.5 7.5 10.814 1.5 7.5 1.5Z" stroke="currentColor" strokeWidth="1.2"/>
+                <path d="M5.5 7.5L7 9L9.5 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              开始检测
+            </button>
+            <button onClick={() => setLocation("/chat")} className="btn-ghost">
+              咨询专家
+            </button>
+          </div>
+
+          {/* Stats */}
+          <div className={`mt-10 flex items-center gap-8 anim-fade-up d-400 ${ready ? "" : "opacity-0"}`}>
+            {[
+              { n: "98%", sub: "准确率" },
+              { n: "30s", sub: "出结果" },
+              { n: "12+", sub: "检测维度" },
+            ].map((s) => (
+              <div key={s.sub}>
+                <div
+                  className="text-[#C17B5C]"
+                  style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.5rem", fontWeight: 400, lineHeight: 1 }}
                 >
-                  综合皮肤评分
-                </p>
-                <div className="mt-3 flex gap-1">
-                  {[75, 88, 62, 90, 78].map((v, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-sm"
-                      style={{
-                        height: "3px",
-                        background: `rgba(201,169,110,${v / 100 * 0.8 + 0.1})`,
-                      }}
-                    />
-                  ))}
+                  {s.n}
+                </div>
+                <div
+                  className="text-[#B5ADA7] text-[11px] mt-1"
+                  style={{ fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em" }}
+                >
+                  {s.sub}
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* Corner accent */}
+        {/* Right panel — image */}
+        <div
+          className={`hidden md:flex relative flex-shrink-0 items-end justify-center anim-fade-in d-200 ${ready ? "" : "opacity-0"}`}
+          style={{ width: "clamp(320px, 42vw, 560px)" }}
+        >
+          {/* Warm bg shape behind image */}
+          <div
+            className="absolute bottom-0 right-0 w-[90%] h-[92%]"
+            style={{
+              background: "linear-gradient(160deg, #E8E2D9 0%, #DDD7CE 100%)",
+              borderRadius: "16px 16px 0 0",
+            }}
+          />
+
+          {/* Portrait */}
+          <img
+            src={HERO_IMAGE}
+            alt="皮肤分析示例"
+            className="relative z-10 object-cover object-top"
+            style={{
+              width: "82%",
+              height: "90%",
+              borderRadius: "12px 12px 0 0",
+              objectPosition: "center top",
+            }}
+          />
+
+          {/* Score card — floating */}
+          <ScoreCard ready={ready} />
+
+          {/* Metrics strip — floating bottom-left */}
+          <MetricsStrip ready={ready} />
+        </div>
+      </div>
+
+      {/* ── Bottom bar ── */}
+      <div
+        className={`relative z-20 flex-shrink-0 flex items-center justify-between px-8 md:px-12 py-3 border-t border-[rgba(45,36,32,0.06)] anim-fade-in d-500 ${ready ? "" : "opacity-0"}`}
+      >
+        <p
+          className="text-[#B5ADA7] text-xs"
+          style={{ fontFamily: "'DM Sans', sans-serif" }}
+        >
+          © 2025 芯颜 AI · 专业皮肤智能分析
+        </p>
+        <div className="flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#C17B5C] opacity-70" />
+          <span
+            className="text-[#B5ADA7] text-xs"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            服务运行中
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Score card floating overlay */
+function ScoreCard({ ready }: { ready: boolean }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!ready) return;
+    const start = Date.now();
+    const duration = 1200;
+    const target = 82;
+    const timer = setInterval(() => {
+      const p = Math.min((Date.now() - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(eased * target));
+      if (p >= 1) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [ready]);
+
+  return (
+    <div
+      className={`absolute top-8 left-0 -translate-x-1/3 z-20 anim-scale-in d-500 ${ready ? "" : "opacity-0"}`}
+      style={{
+        background: "rgba(253,250,247,0.92)",
+        backdropFilter: "blur(16px)",
+        border: "1px solid rgba(193,123,92,0.15)",
+        borderRadius: "12px",
+        padding: "16px 20px",
+        boxShadow: "0 8px 32px rgba(45,36,32,0.1), 0 2px 8px rgba(45,36,32,0.06)",
+        minWidth: "148px",
+      }}
+    >
+      <div className="flex items-end gap-1 mb-1">
+        <span
+          className="text-clay-gradient"
+          style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "2.75rem", fontWeight: 400, lineHeight: 1 }}
+        >
+          {count}
+        </span>
+        <span className="text-[#B5ADA7] text-sm mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          / 100
+        </span>
+      </div>
+      <div className="warm-divider mb-2" />
+      <p className="text-[#9A8C82] text-[11px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        综合皮肤评分
+      </p>
+      {/* Mini bar chart */}
+      <div className="mt-2.5 flex items-end gap-1">
+        {[88, 72, 65, 58, 78, 91].map((v, i) => (
+          <div
+            key={i}
+            className="flex-1 rounded-sm"
+            style={{
+              height: `${Math.round(v * 0.22)}px`,
+              background: `rgba(193,123,92,${0.25 + (v / 100) * 0.65})`,
+              transition: `height 0.8s cubic-bezier(0.22,1,0.36,1) ${i * 80}ms`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* Metrics strip */
+function MetricsStrip({ ready }: { ready: boolean }) {
+  return (
+    <div
+      className={`absolute bottom-6 right-4 z-20 anim-fade-up d-600 ${ready ? "" : "opacity-0"}`}
+      style={{
+        background: "rgba(253,250,247,0.88)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(193,123,92,0.12)",
+        borderRadius: "10px",
+        padding: "12px 14px",
+        boxShadow: "0 4px 16px rgba(45,36,32,0.08)",
+      }}
+    >
+      <p
+        className="text-[#B5ADA7] text-[10px] mb-2.5 tracking-wider uppercase"
+        style={{ fontFamily: "'DM Sans', sans-serif" }}
+      >
+        检测维度
+      </p>
+      <div className="space-y-1.5">
+        {METRICS.map((m) => (
+          <div key={m.label} className="flex items-center gap-2.5">
+            <span
+              className="text-[#7A6E68] text-[11px] w-8 flex-shrink-0"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {m.label}
+            </span>
+            <div className="w-20 h-1 bg-[rgba(45,36,32,0.08)] rounded-full overflow-hidden">
               <div
-                className="absolute top-4 right-4 w-8 h-8 pointer-events-none"
+                className="h-full rounded-full"
                 style={{
-                  borderTop: "1px solid rgba(201,169,110,0.4)",
-                  borderRight: "1px solid rgba(201,169,110,0.4)",
-                }}
-              />
-              <div
-                className="absolute bottom-4 left-4 w-8 h-8 pointer-events-none"
-                style={{
-                  borderBottom: "1px solid rgba(201,169,110,0.4)",
-                  borderLeft: "1px solid rgba(201,169,110,0.4)",
+                  width: `${m.val}%`,
+                  background: `rgba(193,123,92,${0.35 + (m.val / 100) * 0.55})`,
+                  transition: "width 1s cubic-bezier(0.22,1,0.36,1)",
                 }}
               />
             </div>
+            <span
+              className="text-[#C17B5C] text-[11px] w-6 text-right flex-shrink-0"
+              style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
+            >
+              {m.val}
+            </span>
           </div>
-        </div>
+        ))}
       </div>
-
-      {/* Bottom scroll indicator */}
-      <div
-        className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-700 delay-800 ${visible ? "opacity-100" : "opacity-0"}`}
-      >
-        <span
-          className="text-[#7A6F63] text-[9px] tracking-[0.3em] uppercase"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Scroll
-        </span>
-        <div className="w-px h-8 overflow-hidden">
-          <div
-            className="w-full h-full"
-            style={{
-              background: "linear-gradient(to bottom, #C9A96E, transparent)",
-              animation: "scrollLine 2s ease-in-out infinite",
-            }}
-          />
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes scrollLine {
-          0% { transform: translateY(-100%); opacity: 1; }
-          100% { transform: translateY(100%); opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 }

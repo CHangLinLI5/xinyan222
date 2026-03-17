@@ -1,6 +1,7 @@
 /**
- * LUMIÈRE AI — App Router
- * Routes: / (Landing) | /chat (AI Dialog) | /result (Analysis Result)
+ * 芯颜 AI — App Router
+ * Theme: Light (warm ivory)
+ * Routes: / | /chat | /result
  */
 
 import { Toaster } from "@/components/ui/sonner";
@@ -28,16 +29,17 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster
-            theme="dark"
+            theme="light"
             toastOptions={{
               style: {
-                background: "#1A1510",
-                border: "1px solid rgba(201,169,110,0.2)",
-                color: "#F5F0E8",
+                background: "#FDFAF7",
+                border: "1px solid rgba(193,123,92,0.2)",
+                color: "#2D2420",
                 fontFamily: "'DM Sans', sans-serif",
+                borderRadius: "10px",
               },
             }}
           />
