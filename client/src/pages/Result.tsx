@@ -296,6 +296,9 @@ export default function Result() {
           </div>
         </div>
       </div>
+
+      {/* Mobile bottom tab bar spacing */}
+      <div className="md:hidden flex-shrink-0 h-16" />
     </div>
   );
 }

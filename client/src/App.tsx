@@ -1,7 +1,7 @@
 /**
  * 芯颜 AI — App Router
  * Theme: Light (warm ivory)
- * Routes: / | /chat | /result | /calendar | /history | /profile | /trends
+ * Routes: / | /chat | /result | /calendar | /history | /profile | /login | /trends
  */
 
 import { Toaster } from "@/components/ui/sonner";
@@ -10,12 +10,15 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { UserProvider } from "./contexts/UserContext";
+import MobileTabBar from "./components/MobileTabBar";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Result from "./pages/Result";
 import Calendar from "./pages/Calendar";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
+import Login from "./pages/Login";
 import Trends from "./pages/Trends";
 
 function Router() {
@@ -27,6 +30,7 @@ function Router() {
       <Route path="/calendar" component={Calendar} />
       <Route path="/history" component={History} />
       <Route path="/profile" component={Profile} />
+      <Route path="/login" component={Login} />
       <Route path="/trends" component={Trends} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
@@ -38,21 +42,24 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster
-            theme="light"
-            toastOptions={{
-              style: {
-                background: "#FDFAF7",
-                border: "1px solid rgba(193,123,92,0.2)",
-                color: "#2D2420",
-                fontFamily: "'DM Sans', sans-serif",
-                borderRadius: "10px",
-              },
-            }}
-          />
-          <Router />
-        </TooltipProvider>
+        <UserProvider>
+          <TooltipProvider>
+            <Toaster
+              theme="light"
+              toastOptions={{
+                style: {
+                  background: "#FDFAF7",
+                  border: "1px solid rgba(193,123,92,0.2)",
+                  color: "#2D2420",
+                  fontFamily: "'DM Sans', sans-serif",
+                  borderRadius: "10px",
+                },
+              }}
+            />
+            <Router />
+            <MobileTabBar />
+          </TooltipProvider>
+        </UserProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

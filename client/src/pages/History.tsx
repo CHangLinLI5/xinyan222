@@ -338,6 +338,9 @@ export default function History() {
       </div>
 
       <ReportModal record={activeRecord} onClose={() => setActiveRecord(null)} />
+
+      {/* Mobile bottom tab bar spacing */}
+      <div className="md:hidden flex-shrink-0 h-16" />
     </div>
   );
 }

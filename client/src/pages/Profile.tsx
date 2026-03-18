@@ -1,75 +1,76 @@
 /**
- * 芯颜 AI — Profile Page
+ * 芯颜 AI — Profile / 个人中心 Page
  * Design: Warm Ivory Minimalism
- * Layout: Full-viewport locked, avatar + skin profile + goals
- * Features: Skin type selection, care goals, preference tags
+ * Features: User info card, stats, menu items, settings
  */
 
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useUser } from "@/contexts/UserContext";
 import { MOCK_RECORDS } from "@/lib/mockData";
 
-const SKIN_TYPES = [
-  { id: "dry", label: "干性", icon: "M9 3C6.239 3 4 5.239 4 8c0 4 5 9 5 9s5-5 5-9c0-2.761-2.239-5-5-5Z", desc: "皮肤偏干，易紧绷" },
-  { id: "oily", label: "油性", icon: "M9 2C5.686 2 3 4.686 3 8s2.686 6 6 6 6-2.686 6-6-2.686-6-6-6Zm0 9a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z", desc: "T区易出油" },
-  { id: "combo", label: "混合性", icon: "M3 9h6M9 3v6M15 9h-3M12 6v3M3 15h18", desc: "T区油，两颊干" },
-  { id: "sensitive", label: "敏感性", icon: "M9 3L3 15h12L9 3Z", desc: "易泛红过敏" },
-  { id: "normal", label: "中性", icon: "M9 1a8 8 0 1 0 0 16A8 8 0 0 0 9 1Zm0 14A6 6 0 1 1 9 3a6 6 0 0 1 0 12Z", desc: "水油平衡" },
-];
-
-const GOALS = [
-  { id: "hydrate", label: "深度补水", icon: "💧" },
-  { id: "brighten", label: "提亮肤色", icon: "✨" },
-  { id: "pores", label: "收缩毛孔", icon: "🔬" },
-  { id: "spots", label: "淡化色斑", icon: "🌸" },
-  { id: "firm", label: "紧致抗老", icon: "⏳" },
-  { id: "calm", label: "舒缓修护", icon: "🌿" },
-  { id: "oil", label: "控油平衡", icon: "⚖️" },
-  { id: "sun", label: "防晒防护", icon: "☀️" },
-];
-
-const CONCERNS = [
-  "黑头", "白头", "痘印", "细纹", "暗沉", "色素沉着",
-  "毛孔粗大", "皮肤粗糙", "过敏泛红", "黑眼圈", "法令纹", "颈纹",
-];
-
-const ROUTINES = [
-  { id: "minimal", label: "极简护肤", desc: "3步以内，高效简洁", icon: "M5 12H19M12 5l7 7-7 7" },
-  { id: "standard", label: "标准护肤", desc: "5-7步，全面护理", icon: "M4 6h16M4 12h16M4 18h16" },
-  { id: "advanced", label: "进阶护肤", desc: "精华叠加，深度护理", icon: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" },
-];
+const SKIN_TYPES = ["干性", "油性", "混合偏干", "混合偏油", "中性", "敏感性"];
 
 export default function Profile() {
   const [, setLocation] = useLocation();
+  const { user, isLoggedIn, logout, updateProfile } = useUser();
   const [ready, setReady] = useState(false);
-  const [skinType, setSkinType] = useState("combo");
-  const [goals, setGoals] = useState<string[]>(["hydrate", "spots"]);
-  const [concerns, setConcerns] = useState<string[]>(["毛孔粗大", "暗沉"]);
-  const [routine, setRoutine] = useState("standard");
-  const [editName, setEditName] = useState(false);
-  const [name, setName] = useState("芯颜用户");
-  const [saved, setSaved] = useState(false);
+  const [showSkinType, setShowSkinType] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
+  const [editingNickname, setEditingNickname] = useState(false);
+  const [nicknameInput, setNicknameInput] = useState("");
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 80);
     return () => clearTimeout(t);
   }, []);
 
-  const totalRecords = MOCK_RECORDS.length;
-  const avgScore = Math.round(MOCK_RECORDS.reduce((s, r) => s + r.score, 0) / totalRecords);
-  const bestScore = Math.max(...MOCK_RECORDS.map(r => r.score));
-  const latestScore = MOCK_RECORDS.sort((a, b) => b.date.localeCompare(a.date))[0]?.score ?? 0;
+  // If not logged in, show login prompt
+  if (!isLoggedIn) {
+    return <GuestProfile onLogin={() => setLocation("/login")} ready={ready} setLocation={setLocation} />;
+  }
 
-  const toggleGoal = (id: string) => {
-    setGoals(g => g.includes(id) ? g.filter(x => x !== id) : [...g, id]);
-  };
-  const toggleConcern = (c: string) => {
-    setConcerns(cs => cs.includes(c) ? cs.filter(x => x !== c) : [...cs, c]);
-  };
+  const maskedPhone = user!.phone.slice(0, 3) + "****" + user!.phone.slice(-4);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const menuItems = [
+    {
+      icon: "M7 3V8L11 11M7 1C3.134 1 0 4.134 0 8s3.134 7 7 7 7-3.134 7-7S10.866 1 7 1Z",
+      label: "检测记录",
+      sub: `${MOCK_RECORDS.length} 条记录`,
+      action: () => setLocation("/history"),
+    },
+    {
+      icon: "M1 3H13V13H1V3ZM4 1V4M10 1V4M1 7H13",
+      label: "护肤日历",
+      sub: "查看护肤打卡",
+      action: () => setLocation("/calendar"),
+    },
+    {
+      icon: "M7 1L9 5H13L10 8L11 12L7 9.5L3 12L4 8L1 5H5L7 1Z",
+      label: "我的收藏",
+      sub: "3 个方案",
+      action: () => {},
+    },
+    {
+      icon: "M2 2H12V12H2V2ZM5 5H9M5 7.5H8",
+      label: "护肤方案",
+      sub: "查看定制方案",
+      action: () => setLocation("/result"),
+    },
+  ];
+
+  const settingItems = [
+    { label: "肤质设置", value: user!.skinType, action: () => setShowSkinType(true) },
+    { label: "消息通知", value: "已开启", action: () => {} },
+    { label: "隐私设置", value: "", action: () => {} },
+    { label: "关于芯颜 AI", value: "v1.0.0", action: () => {} },
+  ];
+
+  const handleNicknameSubmit = () => {
+    if (nicknameInput.trim()) {
+      updateProfile({ nickname: nicknameInput.trim() });
+    }
+    setEditingNickname(false);
   };
 
   return (
@@ -77,13 +78,15 @@ export default function Profile() {
       className="page-locked flex flex-col"
       style={{ background: "linear-gradient(135deg, #F5F0E8 0%, #EDE8DF 100%)" }}
     >
-      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(193,123,92,0.06) 0%, transparent 70%)" }} />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(193,123,92,0.08) 0%, transparent 60%)",
+        }}
+      />
 
       {/* Header */}
-      <header
-        className="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 border-b border-[rgba(45,36,32,0.07)] flex-shrink-0 bg-[rgba(242,237,230,0.85)]"
-        style={{ backdropFilter: "blur(12px)" }}
-      >
+      <header className="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 border-b border-[rgba(45,36,32,0.07)] flex-shrink-0 bg-[rgba(242,237,230,0.85)]" style={{ backdropFilter: "blur(12px)" }}>
         <button
           onClick={() => setLocation("/")}
           className="flex items-center gap-1.5 text-[#9A8C82] hover:text-[#2D2420] transition-colors text-sm"
@@ -94,304 +97,376 @@ export default function Profile() {
           </svg>
           返回
         </button>
-
-        <div className="flex items-center gap-2">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-            <circle cx="11" cy="11" r="10" stroke="#C17B5C" strokeWidth="1.2" />
-            <circle cx="11" cy="11" r="5" fill="rgba(193,123,92,0.15)" stroke="#C17B5C" strokeWidth="1" />
-            <circle cx="11" cy="11" r="2" fill="#C17B5C" />
-          </svg>
-          <span className="text-[#2D2420] font-medium text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            芯颜 <span className="text-[#C17B5C]">AI</span>
-          </span>
-        </div>
-
+        <span className="text-[#2D2420] font-medium text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          个人中心
+        </span>
         <button
-          onClick={handleSave}
-          className={`text-sm font-medium transition-all duration-300 ${saved ? "text-[#9A5E42]" : "text-[#C17B5C] hover:text-[#9A5E42]"}`}
+          onClick={() => setShowLogout(true)}
+          className="text-[#9A8C82] hover:text-[#C17B5C] transition-colors text-sm"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          {saved ? "已保存 ✓" : "保存"}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 2H3C2.448 2 2 2.448 2 3V13C2 13.552 2.448 14 3 14H6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M10 11L14 8L10 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M14 8H6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
         </button>
       </header>
 
-      {/* Body */}
-      <div className={`relative z-10 flex-1 overflow-hidden flex flex-col md:flex-row anim-fade-in ${ready ? "" : "opacity-0"}`}>
+      {/* Body — scrollable */}
+      <div className={`relative z-10 flex-1 overflow-y-auto anim-fade-in ${ready ? "" : "opacity-0"}`}>
+        <div className="max-w-lg mx-auto px-5 py-6 space-y-5">
 
-        {/* LEFT: Avatar + Stats */}
-        <div
-          className="flex-shrink-0 flex flex-col items-center justify-start px-8 py-8 border-b md:border-b-0 md:border-r border-[rgba(45,36,32,0.07)]"
-          style={{ width: "100%", maxWidth: "280px", minWidth: "220px" }}
-        >
-          {/* Avatar */}
-          <div className="relative mb-5">
-            <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, rgba(193,123,92,0.15) 0%, rgba(193,123,92,0.08) 100%)",
-                border: "1.5px solid rgba(193,123,92,0.25)",
-              }}
-            >
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="12" r="6" stroke="#C17B5C" strokeWidth="1.5" />
-                <path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </div>
-            <button
-              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center"
-              style={{ background: "#C17B5C", border: "2px solid #F5F0E8" }}
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M7 1L9 3L3 9H1V7L7 1Z" stroke="#FDFAF7" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
+          {/* User card */}
+          <div
+            className="rounded-2xl p-5 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(193,123,92,0.12) 0%, rgba(193,123,92,0.04) 100%)",
+              border: "1px solid rgba(193,123,92,0.15)",
+            }}
+          >
+            {/* Decorative circles */}
+            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full" style={{ background: "rgba(193,123,92,0.06)" }} />
+            <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full" style={{ background: "rgba(193,123,92,0.04)" }} />
 
-          {/* Name */}
-          <div className="mb-1 flex items-center gap-2">
-            {editName ? (
-              <input
-                autoFocus
-                value={name}
-                onChange={e => setName(e.target.value)}
-                onBlur={() => setEditName(false)}
-                onKeyDown={e => e.key === "Enter" && setEditName(false)}
-                className="text-center bg-transparent border-b border-[#C17B5C] outline-none text-[#2D2420] text-base w-28"
-                style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: 400 }}
-              />
-            ) : (
-              <button
-                onClick={() => setEditName(true)}
-                className="text-[#2D2420] hover:text-[#C17B5C] transition-colors"
-                style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem", fontWeight: 400 }}
-              >
-                {name}
-              </button>
-            )}
-          </div>
-          <p className="text-[#B5ADA7] text-xs mb-6" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            点击名称可编辑
-          </p>
-
-          {/* Stats */}
-          <div className="w-full space-y-3">
-            {[
-              { label: "累计检测", value: totalRecords, unit: "次" },
-              { label: "平均评分", value: avgScore, unit: "分" },
-              { label: "最高评分", value: bestScore, unit: "分" },
-              { label: "最近评分", value: latestScore, unit: "分" },
-            ].map(s => (
+            <div className="relative flex items-center gap-4">
+              {/* Avatar */}
               <div
-                key={s.label}
-                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl"
-                style={{ background: "rgba(253,250,247,0.7)", border: "1px solid rgba(45,36,32,0.07)" }}
+                className="w-16 h-16 rounded-2xl flex-shrink-0 overflow-hidden"
+                style={{ border: "2px solid rgba(193,123,92,0.25)" }}
               >
-                <span className="text-[#9A8C82] text-xs" style={{ fontFamily: "'DM Sans', sans-serif" }}>{s.label}</span>
-                <div className="flex items-baseline gap-0.5">
-                  <span className="text-[#C17B5C] font-medium" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem" }}>{s.value}</span>
-                  <span className="text-[#C4BAB3] text-[10px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{s.unit}</span>
+                <img src={user!.avatar} alt="头像" className="w-full h-full object-cover" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                {editingNickname ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={nicknameInput}
+                      onChange={(e) => setNicknameInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleNicknameSubmit()}
+                      autoFocus
+                      className="bg-[rgba(253,250,247,0.8)] rounded-lg px-2 py-1 text-[#2D2420] text-sm outline-none border border-[rgba(193,123,92,0.3)] w-28"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      maxLength={12}
+                    />
+                    <button onClick={handleNicknameSubmit} className="text-[#C17B5C] text-xs">确定</button>
+                    <button onClick={() => setEditingNickname(false)} className="text-[#B5ADA7] text-xs">取消</button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h2
+                      className="text-[#2D2420] truncate"
+                      style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.15rem", fontWeight: 400 }}
+                    >
+                      {user!.nickname}
+                    </h2>
+                    <button
+                      onClick={() => { setNicknameInput(user!.nickname); setEditingNickname(true); }}
+                      className="text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                <p className="text-[#9A8C82] text-xs mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  {maskedPhone}
+                </p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="pill-clay text-[10px]">{user!.skinType}</span>
+                  <span className="text-[#C4BAB3] text-[10px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    加入于 {user!.joinDate}
+                  </span>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Stats row */}
+            <div className="relative mt-5 pt-4 border-t border-[rgba(193,123,92,0.12)] grid grid-cols-3 gap-4">
+              {[
+                { n: String(MOCK_RECORDS.length), label: "检测次数" },
+                { n: String(user!.avgScore), label: "平均评分" },
+                { n: "28", label: "连续天数" },
+              ].map((s) => (
+                <div key={s.label} className="text-center">
+                  <div className="text-[#C17B5C]" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.3rem", fontWeight: 400, lineHeight: 1 }}>
+                    {s.n}
+                  </div>
+                  <div className="text-[#B5ADA7] text-[10px] mt-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Quick nav */}
-          <div className="w-full mt-5 space-y-1.5">
+          {/* Quick menu */}
+          <div>
+            <p className="text-[#B5ADA7] text-[10px] tracking-widest uppercase mb-2.5 px-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              我的功能
+            </p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {menuItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className="card-warm p-4 text-left group flex items-start gap-3"
+                >
+                  <div
+                    className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-200"
+                    style={{ background: "rgba(193,123,92,0.08)" }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d={item.icon} stroke="#C17B5C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[#2D2420] text-sm font-medium group-hover:text-[#C17B5C] transition-colors" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                      {item.label}
+                    </p>
+                    <p className="text-[#B5ADA7] text-[10px] mt-0.5 truncate" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                      {item.sub}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Settings */}
+          <div>
+            <p className="text-[#B5ADA7] text-[10px] tracking-widest uppercase mb-2.5 px-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              设置
+            </p>
+            <div className="card-warm overflow-hidden divide-y divide-[rgba(45,36,32,0.06)]">
+              {settingItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-[rgba(193,123,92,0.03)] transition-colors group"
+                >
+                  <span className="text-[#5C4F47] text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    {item.label}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {item.value && (
+                      <span className="text-[#B5ADA7] text-xs" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                        {item.value}
+                      </span>
+                    )}
+                    <svg className="text-[#C4BAB3] group-hover:text-[#C17B5C] transition-colors" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Logout button */}
+          <button
+            onClick={() => setShowLogout(true)}
+            className="w-full py-3 rounded-xl text-sm text-[#9A8C82] hover:text-[#C0392B] border border-[rgba(45,36,32,0.1)] hover:border-[rgba(192,57,43,0.3)] hover:bg-[rgba(192,57,43,0.03)] transition-all duration-200"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            退出登录
+          </button>
+
+          {/* Bottom spacing for mobile tab bar */}
+          <div className="h-16 md:h-4" />
+        </div>
+      </div>
+
+      {/* Skin type picker modal */}
+      {showSkinType && (
+        <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center" onClick={() => setShowSkinType(false)}>
+          <div className="absolute inset-0 bg-[rgba(45,36,32,0.3)]" style={{ backdropFilter: "blur(4px)" }} />
+          <div
+            className="relative w-full md:w-96 bg-[#FDFAF7] rounded-t-2xl md:rounded-2xl p-5 anim-fade-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-[#2D2420] font-medium mb-4" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem" }}>
+              选择肤质类型
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {SKIN_TYPES.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => { updateProfile({ skinType: type }); setShowSkinType(false); }}
+                  className={`py-3 rounded-xl text-sm transition-all duration-200 ${
+                    user!.skinType === type
+                      ? "bg-[rgba(193,123,92,0.12)] text-[#C17B5C] border border-[rgba(193,123,92,0.3)] font-medium"
+                      : "bg-[rgba(45,36,32,0.04)] text-[#7A6E68] border border-transparent hover:border-[rgba(193,123,92,0.2)]"
+                  }`}
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
             <button
-              onClick={() => setLocation("/trends")}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[#7A6E68] hover:text-[#C17B5C] hover:bg-[rgba(193,123,92,0.06)] transition-all text-sm"
+              onClick={() => setShowSkinType(false)}
+              className="w-full mt-4 py-2.5 text-[#9A8C82] text-sm"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M1 11L5 7L8 9L13 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              趋势分析
-            </button>
-            <button
-              onClick={() => setLocation("/history")}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[#7A6E68] hover:text-[#C17B5C] hover:bg-[rgba(193,123,92,0.06)] transition-all text-sm"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.1" />
-                <path d="M7 4V7L9.5 9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-              </svg>
-              历史记录
+              取消
             </button>
           </div>
         </div>
+      )}
 
-        {/* RIGHT: Settings */}
-        <div className="flex-1 overflow-y-auto px-5 md:px-8 py-6 space-y-8">
-
-          {/* Skin Type */}
-          <section>
-            <h3
-              className="text-[#2D2420] mb-1"
-              style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1rem", fontWeight: 400 }}
-            >
-              肤质类型
-            </h3>
-            <p className="text-[#B5ADA7] text-xs mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              选择最符合你日常皮肤状态的类型
-            </p>
-            <div className="grid grid-cols-5 gap-2">
-              {SKIN_TYPES.map(st => (
-                <button
-                  key={st.id}
-                  onClick={() => setSkinType(st.id)}
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all duration-200 ${skinType === st.id
-                    ? "bg-[rgba(193,123,92,0.12)] border-[rgba(193,123,92,0.4)]"
-                    : "bg-[rgba(253,250,247,0.6)] border-[rgba(45,36,32,0.08)] hover:border-[rgba(193,123,92,0.2)]"
-                    }`}
-                  style={{ border: "1px solid" }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d={st.icon} stroke={skinType === st.id ? "#C17B5C" : "#B5ADA7"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span
-                    className={`text-xs font-medium ${skinType === st.id ? "text-[#C17B5C]" : "text-[#9A8C82]"}`}
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    {st.label}
-                  </span>
-                </button>
-              ))}
+      {/* Logout confirmation modal */}
+      {showLogout && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={() => setShowLogout(false)}>
+          <div className="absolute inset-0 bg-[rgba(45,36,32,0.3)]" style={{ backdropFilter: "blur(4px)" }} />
+          <div
+            className="relative w-80 bg-[#FDFAF7] rounded-2xl p-6 text-center anim-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style={{ background: "rgba(192,57,43,0.08)" }}>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M8 3H4C3.448 3 3 3.448 3 4V16C3 16.552 3.448 17 4 17H8" stroke="#C0392B" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M13 14L17 10L13 6" stroke="#C0392B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M17 10H8" stroke="#C0392B" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
             </div>
-            {skinType && (
-              <p className="mt-2 text-[#B5ADA7] text-xs" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                {SKIN_TYPES.find(s => s.id === skinType)?.desc}
+            <h3 className="text-[#2D2420] font-medium mb-1" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.05rem" }}>
+              确认退出登录？
+            </h3>
+            <p className="text-[#9A8C82] text-xs mb-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              退出后将无法查看个人数据
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogout(false)}
+                className="flex-1 btn-ghost py-2.5 text-sm"
+              >
+                取消
+              </button>
+              <button
+                onClick={() => { logout(); setShowLogout(false); }}
+                className="flex-1 py-2.5 rounded-md text-sm font-medium text-white transition-all duration-200"
+                style={{ background: "#C0392B" }}
+              >
+                确认退出
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Guest profile view — shown when not logged in */
+function GuestProfile({ onLogin, ready, setLocation }: { onLogin: () => void; ready: boolean; setLocation: (path: string) => void }) {
+  return (
+    <div
+      className="page-locked flex flex-col"
+      style={{ background: "linear-gradient(135deg, #F5F0E8 0%, #EDE8DF 100%)" }}
+    >
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(193,123,92,0.08) 0%, transparent 60%)",
+        }}
+      />
+
+      {/* Header */}
+      <header className="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 border-b border-[rgba(45,36,32,0.07)] flex-shrink-0 bg-[rgba(242,237,230,0.85)]" style={{ backdropFilter: "blur(12px)" }}>
+        <button
+          onClick={() => setLocation("/")}
+          className="flex items-center gap-1.5 text-[#9A8C82] hover:text-[#2D2420] transition-colors text-sm"
+          style={{ fontFamily: "'DM Sans', sans-serif" }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          返回
+        </button>
+        <span className="text-[#2D2420] font-medium text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          个人中心
+        </span>
+        <div className="w-12" />
+      </header>
+
+      {/* Body */}
+      <div className={`relative z-10 flex-1 overflow-y-auto anim-fade-in ${ready ? "" : "opacity-0"}`}>
+        <div className="max-w-lg mx-auto px-5 py-6 space-y-5">
+
+          {/* Guest card */}
+          <div
+            className="rounded-2xl p-6 text-center relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(193,123,92,0.1) 0%, rgba(193,123,92,0.03) 100%)",
+              border: "1px solid rgba(193,123,92,0.15)",
+            }}
+          >
+            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full" style={{ background: "rgba(193,123,92,0.06)" }} />
+
+            <div className="relative">
+              {/* Avatar placeholder */}
+              <div
+                className="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4"
+                style={{ background: "rgba(193,123,92,0.08)", border: "2px dashed rgba(193,123,92,0.25)" }}
+              >
+                <svg width="32" height="32" viewBox="0 0 22 22" fill="none">
+                  <circle cx="11" cy="8" r="3.5" stroke="#C17B5C" strokeWidth="1.3" opacity="0.5" />
+                  <path d="M4 19C4 15.134 7.134 12.5 11 12.5C14.866 12.5 18 15.134 18 19" stroke="#C17B5C" strokeWidth="1.3" strokeLinecap="round" opacity="0.5" />
+                </svg>
+              </div>
+
+              <h2 className="text-[#2D2420] mb-1" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.2rem", fontWeight: 400 }}>
+                登录芯颜 AI
+              </h2>
+              <p className="text-[#9A8C82] text-sm mb-5 max-w-xs mx-auto" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                登录后可保存检测记录、查看历史报告、获取个性化护肤方案
               </p>
-            )}
-          </section>
 
-          <div className="warm-divider" />
-
-          {/* Care Goals */}
-          <section>
-            <h3
-              className="text-[#2D2420] mb-1"
-              style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1rem", fontWeight: 400 }}
-            >
-              护肤目标
-            </h3>
-            <p className="text-[#B5ADA7] text-xs mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              选择 1-3 个最重要的护肤目标（已选 {goals.length} 个）
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {GOALS.map(g => (
-                <button
-                  key={g.id}
-                  onClick={() => toggleGoal(g.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all duration-200 ${goals.includes(g.id)
-                    ? "bg-[rgba(193,123,92,0.12)] text-[#C17B5C] border-[rgba(193,123,92,0.35)]"
-                    : "bg-[rgba(253,250,247,0.6)] text-[#7A6E68] border-[rgba(45,36,32,0.1)] hover:border-[rgba(193,123,92,0.2)]"
-                    }`}
-                  style={{ border: "1px solid", fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  <span className="text-sm">{g.icon}</span>
-                  {g.label}
-                </button>
-              ))}
+              <button onClick={onLogin} className="btn-primary py-3 px-10 text-sm">
+                立即登录
+              </button>
             </div>
-          </section>
+          </div>
 
-          <div className="warm-divider" />
-
-          {/* Skin Concerns */}
-          <section>
-            <h3
-              className="text-[#2D2420] mb-1"
-              style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1rem", fontWeight: 400 }}
-            >
-              皮肤困扰
-            </h3>
-            <p className="text-[#B5ADA7] text-xs mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              标记你目前最想改善的皮肤问题
+          {/* Feature preview cards */}
+          <div>
+            <p className="text-[#B5ADA7] text-[10px] tracking-widest uppercase mb-2.5 px-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              登录后可享
             </p>
-            <div className="flex flex-wrap gap-2">
-              {CONCERNS.map(c => (
-                <button
-                  key={c}
-                  onClick={() => toggleConcern(c)}
-                  className={`px-3 py-1.5 rounded-full text-sm transition-all duration-200 ${concerns.includes(c)
-                    ? "bg-[rgba(193,123,92,0.1)] text-[#C17B5C] border-[rgba(193,123,92,0.3)]"
-                    : "bg-transparent text-[#9A8C82] border-[rgba(45,36,32,0.1)] hover:border-[rgba(193,123,92,0.2)] hover:text-[#7A6E68]"
-                    }`}
-                  style={{ border: "1px solid", fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <div className="warm-divider" />
-
-          {/* Daily Routine */}
-          <section>
-            <h3
-              className="text-[#2D2420] mb-1"
-              style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1rem", fontWeight: 400 }}
-            >
-              护肤习惯
-            </h3>
-            <p className="text-[#B5ADA7] text-xs mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              选择最符合你日常护肤步骤的方式
-            </p>
-            <div className="space-y-2">
-              {ROUTINES.map(r => (
-                <button
-                  key={r.id}
-                  onClick={() => setRoutine(r.id)}
-                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-left transition-all duration-200 ${routine === r.id
-                    ? "bg-[rgba(193,123,92,0.1)] border-[rgba(193,123,92,0.3)]"
-                    : "bg-[rgba(253,250,247,0.6)] border-[rgba(45,36,32,0.08)] hover:border-[rgba(193,123,92,0.15)]"
-                    }`}
-                  style={{ border: "1px solid" }}
-                >
+            <div className="space-y-2.5">
+              {[
+                { icon: "M7 3V8L11 11M7 1C3.134 1 0 4.134 0 8s3.134 7 7 7 7-3.134 7-7S10.866 1 7 1Z", title: "检测记录云端同步", desc: "所有检测数据自动保存，随时回顾皮肤变化趋势" },
+                { icon: "M1 3H13V13H1V3ZM4 1V4M10 1V4M1 7H13", title: "护肤日历提醒", desc: "智能提醒护肤步骤，养成良好护肤习惯" },
+                { icon: "M7 1L9 5H13L10 8L11 12L7 9.5L3 12L4 8L1 5H5L7 1Z", title: "专属护肤方案", desc: "根据肤质和检测结果，定制个性化护肤方案" },
+              ].map((item) => (
+                <div key={item.title} className="card-warm p-4 flex items-start gap-3.5">
                   <div
                     className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center"
-                    style={{ background: routine === r.id ? "rgba(193,123,92,0.15)" : "rgba(45,36,32,0.04)" }}
+                    style={{ background: "rgba(193,123,92,0.08)" }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d={r.icon} stroke={routine === r.id ? "#C17B5C" : "#B5ADA7"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d={item.icon} stroke="#C17B5C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    <p
-                      className={`text-sm font-medium ${routine === r.id ? "text-[#C17B5C]" : "text-[#2D2420]"}`}
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {r.label}
+                  <div>
+                    <p className="text-[#2D2420] text-sm font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                      {item.title}
                     </p>
                     <p className="text-[#B5ADA7] text-xs mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                      {r.desc}
+                      {item.desc}
                     </p>
                   </div>
-                  {routine === r.id && (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8L7 12L13 4" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </button>
+                </div>
               ))}
             </div>
-          </section>
-
-          {/* Save button */}
-          <div className="pb-4">
-            <button onClick={handleSave} className="btn-primary w-full py-3">
-              {saved ? (
-                <>
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <path d="M3 7.5L6.5 11L12 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  已保存
-                </>
-              ) : "保存个人资料"}
-            </button>
           </div>
+
+          {/* Bottom spacing for mobile tab bar */}
+          <div className="h-16 md:h-4" />
         </div>
       </div>
     </div>

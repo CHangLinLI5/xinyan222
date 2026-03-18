@@ -313,6 +313,9 @@ export default function Calendar() {
       </div>
 
       <ReportModal record={selected} onClose={() => setSelected(null)} />
+
+      {/* Mobile bottom tab bar spacing */}
+      <div className="md:hidden flex-shrink-0 h-16" />
     </div>
   );
 }

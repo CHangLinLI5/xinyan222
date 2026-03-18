@@ -69,6 +69,7 @@ export default function Home() {
             { label: "趋势分析", path: "/trends" },
             { label: "护肤日历", path: "/calendar" },
             { label: "历史记录", path: "/history" },
+            { label: "个人中心", path: "/profile" },
           ].map((item) => (
             <button
               key={item.label}
@@ -123,7 +124,7 @@ export default function Home() {
             { label: "趋势分析", path: "/trends", icon: "M1 11L5 7L8 9L13 3" },
             { label: "护肤日历", path: "/calendar", icon: "M2 3H13V13H2V3ZM5 1V4M10 1V4M2 7H13" },
             { label: "历史记录", path: "/history", icon: "M8 3V8L11 11M8 1C4.134 1 1 4.134 1 8s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7Z" },
-            { label: "个人资料", path: "/profile", icon: "M7 1.5C5.067 1.5 3.5 3.067 3.5 5S5.067 8.5 7 8.5 10.5 6.933 10.5 5 8.933 1.5 7 1.5ZM1 13c0-3.314 2.686-6 6-6s6 2.686 6 6" },
+            { label: "个人中心", path: "/profile", icon: "M7.5 4.5C5.843 4.5 4.5 5.843 4.5 7.5S5.843 10.5 7.5 10.5 10.5 9.157 10.5 7.5 9.157 4.5 7.5 4.5ZM2 14C2 11.239 4.462 9 7.5 9S13 11.239 13 14" },
           ].map((item) => (
             <button
               key={item.label}
@@ -299,7 +300,7 @@ export default function Home() {
 
       {/* ── Bottom bar ── */}
       <div
-        className={`relative z-20 flex-shrink-0 flex items-center justify-between px-6 md:px-12 py-3 border-t border-[rgba(45,36,32,0.06)] anim-fade-in d-500 ${ready ? "" : "opacity-0"}`}
+        className={`relative z-20 flex-shrink-0 hidden md:flex items-center justify-between px-6 md:px-12 py-3 border-t border-[rgba(45,36,32,0.06)] anim-fade-in d-500 ${ready ? "" : "opacity-0"}`}
       >
         <p
           className="text-[#B5ADA7] text-xs"
@@ -335,6 +336,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Mobile bottom tab bar spacing */}
+      <div className="md:hidden flex-shrink-0 h-16" />
     </div>
   );
 }

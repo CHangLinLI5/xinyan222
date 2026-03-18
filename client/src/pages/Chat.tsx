@@ -176,6 +176,9 @@ export default function Chat() {
       </div>
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
+
+      {/* Mobile bottom tab bar spacing */}
+      <div className="md:hidden flex-shrink-0 h-16" />
     </div>
   );
 }

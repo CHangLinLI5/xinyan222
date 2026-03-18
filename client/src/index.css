@@ -267,4 +267,19 @@
     background-size: 200% auto;
     animation: shimmer 1.8s linear infinite;
   }
+
+  /* Mobile tab bar safe area */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .mobile-tab-safe {
+      padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Page with bottom tab bar — mobile viewport adjustment */
+  @media (max-width: 767px) {
+    .page-locked {
+      height: calc(100vh - 0px);
+      /* Tab bar overlays, so no height reduction needed */
+    }
+  }
 }
