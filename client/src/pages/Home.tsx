@@ -66,6 +66,7 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-1">
           {[
             { label: "开始检测", path: "/chat" },
+            { label: "趋势分析", path: "/trends" },
             { label: "护肤日历", path: "/calendar" },
             { label: "历史记录", path: "/history" },
           ].map((item) => (
@@ -80,8 +81,19 @@ export default function Home() {
           ))}
         </div>
 
-        {/* CTA + mobile menu */}
+        {/* CTA + profile + mobile menu */}
         <div className="flex items-center gap-2">
+          {/* Profile icon */}
+          <button
+            onClick={() => setLocation("/profile")}
+            className="hidden md:flex w-8 h-8 items-center justify-center rounded-lg text-[#9A8C82] hover:text-[#C17B5C] hover:bg-[rgba(193,123,92,0.06)] transition-all"
+            title="个人资料"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          </button>
           <button
             onClick={() => setLocation("/chat")}
             className="btn-primary text-sm py-2 px-5"
@@ -108,8 +120,10 @@ export default function Home() {
         <div className="relative z-20 md:hidden flex-shrink-0 mx-4 mb-2 rounded-xl border border-[rgba(45,36,32,0.08)] bg-[rgba(253,250,247,0.95)] overflow-hidden" style={{ backdropFilter: "blur(12px)" }}>
           {[
             { label: "开始检测", path: "/chat", icon: "M7.5 1.5C4.186 1.5 1.5 4.186 1.5 7.5S4.186 13.5 7.5 13.5 13.5 10.814 13.5 7.5 10.814 1.5 7.5 1.5Z" },
+            { label: "趋势分析", path: "/trends", icon: "M1 11L5 7L8 9L13 3" },
             { label: "护肤日历", path: "/calendar", icon: "M2 3H13V13H2V3ZM5 1V4M10 1V4M2 7H13" },
             { label: "历史记录", path: "/history", icon: "M8 3V8L11 11M8 1C4.134 1 1 4.134 1 8s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7Z" },
+            { label: "个人资料", path: "/profile", icon: "M7 1.5C5.067 1.5 3.5 3.067 3.5 5S5.067 8.5 7 8.5 10.5 6.933 10.5 5 8.933 1.5 7 1.5ZM1 13c0-3.314 2.686-6 6-6s6 2.686 6 6" },
           ].map((item) => (
             <button
               key={item.label}
@@ -176,8 +190,11 @@ export default function Home() {
               </svg>
               开始检测
             </button>
-            <button onClick={() => setLocation("/chat")} className="btn-ghost">
-              咨询专家
+            <button onClick={() => setLocation("/trends")} className="btn-ghost">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1 11L5 7L8 9L13 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              查看趋势
             </button>
           </div>
 
@@ -205,6 +222,18 @@ export default function Home() {
                 <path d="M7 4V7L9.5 9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
               </svg>
               历史记录
+            </button>
+            <span className="text-[#DDD7CE]">·</span>
+            <button
+              onClick={() => setLocation("/profile")}
+              className="flex items-center gap-1.5 text-[#9A8C82] hover:text-[#C17B5C] transition-colors text-sm group"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:stroke-[#C17B5C] transition-colors">
+                <circle cx="7" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.1" />
+                <path d="M1.5 13c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+              </svg>
+              个人资料
             </button>
           </div>
 
@@ -278,14 +307,32 @@ export default function Home() {
         >
           © 2025 芯颜 AI · 专业皮肤智能分析
         </p>
-        <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#C17B5C] opacity-70" />
-          <span
-            className="text-[#B5ADA7] text-xs"
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setLocation("/profile")}
+            className="text-[#C4BAB3] hover:text-[#C17B5C] transition-colors text-xs"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            服务运行中
-          </span>
+            个人资料
+          </button>
+          <span className="text-[#DDD7CE] text-xs">·</span>
+          <button
+            onClick={() => setLocation("/trends")}
+            className="text-[#C4BAB3] hover:text-[#C17B5C] transition-colors text-xs"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            趋势分析
+          </button>
+          <span className="text-[#DDD7CE] text-xs">·</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#C17B5C] opacity-70" />
+            <span
+              className="text-[#B5ADA7] text-xs"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              服务运行中
+            </span>
+          </div>
         </div>
       </div>
     </div>

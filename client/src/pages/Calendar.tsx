@@ -63,6 +63,9 @@ export default function Calendar() {
   // Pad to complete last row
   while (cells.length % 7 !== 0) cells.push(null);
 
+  // Month trend mini sparkline
+  const sortedMonthRecords = [...monthRecords].sort((a, b) => a.date.localeCompare(b.date));
+
   return (
     <div
       className="page-locked flex flex-col"
@@ -86,9 +89,21 @@ export default function Calendar() {
             芯颜 <span className="text-[#C17B5C]">AI</span>
           </span>
         </div>
-        <button onClick={() => setLocation("/history")} className="text-[#C17B5C] hover:text-[#9A5E42] transition-colors text-sm font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          历史记录
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setLocation("/trends")}
+            className="hidden sm:flex items-center gap-1.5 text-[#9A8C82] hover:text-[#C17B5C] transition-colors text-xs"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M1 9L4 6L6.5 7.5L11 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            趋势
+          </button>
+          <button onClick={() => setLocation("/history")} className="text-[#C17B5C] hover:text-[#9A5E42] transition-colors text-sm font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            历史记录
+          </button>
+        </div>
       </header>
 
       {/* Body */}
@@ -111,13 +126,34 @@ export default function Calendar() {
               </button>
             </div>
 
-            {/* Month avg score badge */}
-            {avgScore !== null && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "rgba(193,123,92,0.08)", border: "1px solid rgba(193,123,92,0.15)" }}>
-                <span className="text-[#B5ADA7] text-[10px] tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>月均</span>
-                <span className="text-[#C17B5C] font-medium" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem" }}>{avgScore}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {/* Month trend sparkline */}
+              {sortedMonthRecords.length >= 2 && (
+                <div className="hidden sm:flex items-end gap-0.5 h-6">
+                  {sortedMonthRecords.map((r, i) => {
+                    const min = Math.min(...sortedMonthRecords.map(x => x.score));
+                    const max = Math.max(...sortedMonthRecords.map(x => x.score));
+                    const range = max - min || 1;
+                    const h = 6 + ((r.score - min) / range) * 14;
+                    return (
+                      <div
+                        key={i}
+                        className="w-1.5 rounded-sm"
+                        style={{ height: `${h}px`, background: `rgba(193,123,92,${0.3 + (r.score / 100) * 0.55})` }}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Month avg score badge */}
+              {avgScore !== null && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "rgba(193,123,92,0.08)", border: "1px solid rgba(193,123,92,0.15)" }}>
+                  <span className="text-[#B5ADA7] text-[10px] tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>月均</span>
+                  <span className="text-[#C17B5C] font-medium" style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem" }}>{avgScore}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Weekday headers */}
@@ -223,7 +259,13 @@ export default function Calendar() {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(193,123,92,0.08)" }}>
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="13" rx="2" stroke="#C17B5C" strokeWidth="1.2" /><path d="M6 1V4M12 1V4M2 7H16" stroke="#C17B5C" strokeWidth="1.2" strokeLinecap="round" /></svg>
                 </div>
-                <p className="text-[#C4BAB3] text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>本月暂无检测记录</p>
+                <p className="text-[#C4BAB3] text-sm mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>本月暂无检测记录</p>
+                <button
+                  onClick={() => setLocation("/chat")}
+                  className="btn-primary text-xs py-2 px-4"
+                >
+                  立即检测
+                </button>
               </div>
             ) : (
               monthRecords
@@ -255,8 +297,14 @@ export default function Calendar() {
             )}
           </div>
 
-          {/* Quick jump to history */}
-          <div className="flex-shrink-0 px-4 py-4 border-t border-[rgba(45,36,32,0.07)]">
+          {/* Quick actions */}
+          <div className="flex-shrink-0 px-4 py-4 border-t border-[rgba(45,36,32,0.07)] space-y-2">
+            <button onClick={() => setLocation("/trends")} className="btn-primary w-full py-2 text-sm">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path d="M1 10L4.5 6.5L7 8L12 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              查看趋势分析
+            </button>
             <button onClick={() => setLocation("/history")} className="btn-ghost w-full py-2 text-sm">
               查看全部历史
             </button>

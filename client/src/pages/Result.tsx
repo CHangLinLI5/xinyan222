@@ -81,9 +81,15 @@ export default function Result() {
   const [, setLocation] = useLocation();
   const [tab, setTab] = useState<"metrics" | "advice" | "products">("metrics");
   const [ready, setReady] = useState(false);
+  const [saved, setSaved] = useState(false);
   const score = useCountUp(82, 300);
 
   useEffect(() => { const t = setTimeout(() => setReady(true), 80); return () => clearTimeout(t); }, []);
+
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
 
   return (
     <div className="page-locked flex flex-col" style={{ background: "linear-gradient(135deg, #F5F0E8 0%, #EDE8DF 100%)" }}>
@@ -105,7 +111,19 @@ export default function Result() {
             芯颜 <span className="text-[#C17B5C]">AI</span>
           </span>
         </div>
-        <button onClick={() => setLocation("/")} className="btn-ghost py-1.5 px-3 text-xs">重新检测</button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLocation("/trends")}
+            className="hidden sm:flex items-center gap-1.5 text-[#9A8C82] hover:text-[#C17B5C] transition-colors text-xs"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M1 9L4 6L6.5 7.5L11 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            趋势
+          </button>
+          <button onClick={() => setLocation("/")} className="btn-ghost py-1.5 px-3 text-xs">重新检测</button>
+        </div>
       </header>
 
       {/* Main — two column on desktop, stacked on mobile */}
@@ -113,8 +131,8 @@ export default function Result() {
 
         {/* LEFT: Score panel */}
         <div
-          className={`flex-shrink-0 flex flex-col items-center justify-center px-8 py-8 border-b md:border-b-0 md:border-r border-[rgba(45,36,32,0.07)] anim-fade-in ${ready ? "" : "opacity-0"}`}
-          style={{ width: "100%", maxHeight: "220px", minHeight: "200px" }}
+          className={`flex-shrink-0 flex flex-col items-center justify-center px-8 py-6 border-b md:border-b-0 md:border-r border-[rgba(45,36,32,0.07)] anim-fade-in ${ready ? "" : "opacity-0"}`}
+          style={{ width: "100%", maxWidth: "280px", minWidth: "220px" }}
         >
           {/* Mobile: horizontal layout */}
           <div className="flex flex-row md:flex-col items-center gap-6 md:gap-4 w-full justify-center">
@@ -194,6 +212,17 @@ export default function Result() {
                     </div>
                   </div>
                 ))}
+
+                {/* Tip card */}
+                <div
+                  className="mt-4 p-4 rounded-xl"
+                  style={{ background: "rgba(193,123,92,0.06)", border: "1px solid rgba(193,123,92,0.15)" }}
+                >
+                  <p className="text-[#C17B5C] text-xs font-medium mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>💡 芯颜提示</p>
+                  <p className="text-[#7A6E68] text-xs leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    建议每 7-10 天进行一次皮肤检测，持续追踪护肤效果。坚持 4 周后，你将看到明显的改善趋势。
+                  </p>
+                </div>
               </div>
             )}
 
@@ -237,9 +266,32 @@ export default function Result() {
           {/* Bottom actions */}
           <div className="flex-shrink-0 px-5 py-4 border-t border-[rgba(45,36,32,0.07)] flex gap-3">
             <button onClick={() => setLocation("/chat")} className="btn-primary flex-1 py-2.5 text-sm">重新分析</button>
-            <button className="btn-ghost flex-1 py-2.5 text-sm">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V9M7 9L4 6M7 9L10 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><path d="M1 11H13" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
-              保存报告
+            <button
+              onClick={handleSave}
+              className={`btn-ghost flex-1 py-2.5 text-sm transition-all duration-300 ${saved ? "border-[rgba(193,123,92,0.4)] text-[#C17B5C]" : ""}`}
+            >
+              {saved ? (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                    <path d="M2.5 6.5L5.5 9.5L10.5 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  已保存
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V9M7 9L4 6M7 9L10 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><path d="M1 11H13" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
+                  保存报告
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => setLocation("/trends")}
+              className="btn-ghost py-2.5 px-3 text-sm"
+              title="查看趋势"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1 11L5 7L8 9L13 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           </div>
         </div>
